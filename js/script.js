@@ -50,25 +50,58 @@ const pagination = document.getElementById("pagination")
 //         });
 //     })
 
-let articles;
 
 axios.get(url)
     .then(function(res) {
         console.log(res);
 
-        articles = res.data.articles;  // Data comes from Url
+        let articles = res.data.articles;  // Data comes from Url
         let total = res.data.totalResults;
         let pages = Math.ceil(total/5);
     
 
         //Articles list
         let arr_articles = getData(1);
+        showData(arr_articles);
+        
+
+        //Pagination
+        for(i = 1; i <= pages; i++){
+            let page = createNode('button');
+           
+            page.setAttribute('value',i);
+            page.innerText = i;
+            append(pagination, page);
+
+            page.onclick = function(e){
+
+                var val = e.target.value;
+                arr_articles = getData(articles, val);
+            }
+        }
+        
+    })
+
+    function getData(articles, page_number){
+
+        let itemPerPage = 5;
+        --page_number; 
+        // let offset = (page_number-1) * itemPerPage;
+        // let result = articles.slice(offset).slice(0, itemPerPage);
+        let result = articles.slice(page_number * itemPerPage, (page_number + 1) * itemPerPage);
+        console.log(result);
+        return result;
+    }
+
+    function showData(arr_articles){
+        cards.innerHTML = "";
         arr_articles.map((article) => {
+
             let card = createNode("div"),
-                cardImg = createNode('div'),
-                img = createNode('img'),
-                cardCt = createNode('div'),
-                p = createNode('p');
+            cardImg = createNode('div'),
+            img = createNode('img'),
+            cardCt = createNode('div'),
+            p = createNode('p');
 
             //Add classes
             card.classList.add('card');
@@ -83,27 +116,6 @@ axios.get(url)
             append(cardImg, img);
             append(card, cardImg);
             append(card, cardCt);
-            append(cards, card)
+            append(cards, card);
         });
-
-        //Pagination
-        for(i = 1; i <= pages; i++){
-            let page = createNode('a');
-            page.setAttribute('href','javascript:void(0)');
-            page.setAttribute('id',i);
-            page.setAttribute("onclick",getData(id));
-            page.innerText = i;
-            append(pagination, page);
-        }
-        
-    })
-
-    function getData(page_number){
-        let itemPerPage = 5;
-        --page_number; 
-        // let offset = (page_number-1) * itemPerPage;
-        // let result = articles.slice(offset).slice(0, itemPerPage);
-        let result = articles.slice(page_number * itemPerPage, (page_number + 1) * itemPerPage);
-        console.log(result);
-        return result;
     }
